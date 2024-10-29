@@ -27,7 +27,7 @@ const PostWrite = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => { navigation.push('PostWrite', { selectedItem }) }}
+                    onPress={() => { navigation.navigate('PostWrite', { selectedItem }) }}
                 >
                     <Text style={{ fontSize: 18, color: '#808080' }}>선택</Text>
                 </TouchableOpacity>

@@ -31,7 +31,7 @@ const Start = () => {
                         activeOpacity={0.8}
                         hitSlop={5}
                         onPress={() =>
-                            navigation.push('Bottom')
+                            navigation.push('SignIn')
                         }
                     >
                         <Text style={{ fontSize: 14, fontWeight: '900', color: '#9B27FF', }}>로그인</Text>

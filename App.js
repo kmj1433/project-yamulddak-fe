@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
+import { SignUpProvider } from './context/SignUpProvider';
 import CoPurchase from './screens/CoPurchase';
 import Community from './screens/Community';
 import MyAccount from './screens/MyAccount';
@@ -14,6 +15,7 @@ import PostWrite from './screens/PostWrite';
 import Challenge from './screens/Challenge';
 import ChallengeDetail from './screens/ChallengeDetail';
 import Notify from './screens/Notify';
+import SignIn from './screens/SignIn';
 import SignUp_1 from './screens/SignUp_1';
 import SignUp_2 from './screens/SignUp_2';
 import SignUp_3 from './screens/SignUp_3';
@@ -86,24 +88,27 @@ const App = () => {
   };
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name='SignUp_1' component={SignUp_1} />
-        <Stack.Screen name='SignUp_2' component={SignUp_2} />
-        <Stack.Screen name='SignUp_3' component={SignUp_3} />
-        <Stack.Screen name='SignUp_4' component={SignUp_4} />
-        <Stack.Screen name='Bottom' component={BottomTabScreen} />
+    <SignUpProvider>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name='SignUp_1' component={SignUp_1} />
+          <Stack.Screen name='SignUp_2' component={SignUp_2} />
+          <Stack.Screen name='SignUp_3' component={SignUp_3} />
+          <Stack.Screen name='SignUp_4' component={SignUp_4} />
+          <Stack.Screen name='SignIn' component={SignIn} />
+          <Stack.Screen name='Bottom' component={BottomTabScreen} />
 
-        <Stack.Screen name='CoPurchase' component={CoPurchase} />
-        <Stack.Screen name='PostDetail' component={PostDetail} />
-        <Stack.Screen name='PostWrite' component={PostWrite} />
-        <Stack.Screen name='Notify' component={Notify} />
-        <Stack.Screen name='Community' component={Community} />
-        <Stack.Screen name='Challenge' component={Challenge} />
-        <Stack.Screen name='ChallengeDetail' component={ChallengeDetail} />
-        <Stack.Screen name='SelectVege' component={SelectVege} />
-      </Stack.Navigator>
-    </NavigationContainer >
+          <Stack.Screen name='CoPurchase' component={CoPurchase} />
+          <Stack.Screen name='PostDetail' component={PostDetail} />
+          <Stack.Screen name='PostWrite' component={PostWrite} />
+          <Stack.Screen name='Notify' component={Notify} />
+          <Stack.Screen name='Community' component={Community} />
+          <Stack.Screen name='Challenge' component={Challenge} />
+          <Stack.Screen name='ChallengeDetail' component={ChallengeDetail} />
+          <Stack.Screen name='SelectVege' component={SelectVege} />
+        </Stack.Navigator>
+      </NavigationContainer >
+    </SignUpProvider>
   );
 };
 

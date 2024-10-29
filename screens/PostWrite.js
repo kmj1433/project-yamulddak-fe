@@ -19,29 +19,45 @@ const PostWrite = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const selectedItem = route.params?.selectedItem;
+    
+    const [product_name, setProductName] = useState(selectedItem ? selectedItem.name : '');
+    const [title, setTitle] = useState('');
+    const [persons, setPersons] = useState('');
+    const [content, setContent] = useState('');
+
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedOptionText, setSelectedOptionText] = useState('방식을 선택해주세요');
     const [modalDateVisible, setModalDateVisible] = useState(false);
+
+    const [selectedCopurchaseMethodId, setSelectedCopurchaseMethodId] = useState(null);
     const [selectedCheckbox, setSelectedCheckbox] = useState(null);
     const [selectedDates, setSelectedDates] = useState({});
     const [isToggleEnabled, setIsToggleEnabled] = useState(false);
     const [selectedDateOptionText, setSelectedDateOptionText] = useState('날짜를 선택해주세요');
     const [toggleColor, setToggleColor] = useState(false);
 
+    const handlePersonInput = (input) => {
+        if (/^\d*$/.test(input)) {
+            setPersons(input);
+        }
+    };
+
     const today = new Date().toISOString().split('T')[0];
 
     const selectCheckbox = (key) => {
+        const selectedId = parseInt(key, 10);
         setSelectedCheckbox(key === selectedCheckbox ? null : key);
+        setSelectedCopurchaseMethodId(selectedId === selectedCopurchaseMethodId ? null : selectedId); // 선택된 copurchase_method_id 저장
     };
     const getSelectedOptionText = () => {
         switch (selectedCheckbox) {
-            case 'option1':
+            case '1':
                 return '함께 쇼핑부터 할래요';
-            case 'option2':
+            case '2':
                 return '내가 먼저 사고 현장에서 나눠줄래요';
-            case 'option3':
+            case '3':
                 return '내가 먼저 사고 공용 냉장고에 보관할래요';
-            case 'option4':
+            case '4':
                 return '참여자와 조율할래요';
             default:
                 return '방식을 선택해주세요';
@@ -92,25 +108,28 @@ const PostWrite = () => {
     const toggleSwitch = () => setIsToggleEnabled(previousState => !previousState);
 
     const savePostToDB = async () => {
-        console.log('Sending data to server...');
         try {
-            const response = await axios.post('http://172.30.1.39:3000/copurchase-post', {
-                user_id: 1,
-                title: title,
-                product_id: product_id,
-                address: address,
-                address_postcode: address_postcode,
-                address_sub: address_sub,
+            console.log('Sending post data to database...');
+            const response = await axios.post('http://localhost:3000/api/add-copurchase', {
+                user_id: '9',
+                title,
+                product_name,
+                persons, 
+                address: '합정역',
+                address_postcode: '04027',
+                address_sub: '',
                 date_start: selectedDates.start,
                 date_end: selectedDates.end,
                 date_val: isToggleEnabled ? 1 : 0,
                 copurchase_method_id: selectedCopurchaseMethodId,
                 content: JSON.stringify(content),
-            });
-            
+            }, { timeout: 10000 });
+
             console.log('Data saved successfully:', response.data);
+
+            navigation.navigate('Bottom');
         } catch (error) {
-            console.error('Error saving data:', error);
+            console.error('Error:', error);
         }
     };
 
@@ -164,6 +183,26 @@ const PostWrite = () => {
                                 style={{
                                     fontSize: 16,
                                 }}
+                                value={title}
+                                onChangeText={setTitle}
+                            />
+                        </View>
+                    </View>
+                    <View>
+                        <View style={{ flexDirection: 'row', marginTop: 14, alignItems: 'center' }}>
+                            <Text style={styles.essentialCheck}>필수</Text>
+                            <Text style={styles.midTitle}>공동구매 모집인원</Text>
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                placeholder='모집인원을 작성해주세요'
+                                placeholderTextColor={'#929292'}
+                                style={{
+                                    fontSize: 16,
+                                }}
+                                value={persons}
+                                onChangeText={handlePersonInput} 
+                                keyboardType="numeric"
                             />
                         </View>
                     </View>
@@ -197,9 +236,9 @@ const PostWrite = () => {
                                     <View style={styles.modalContentContainer}>
                                         <TouchableOpacity
                                             activeOpacity={0.8}
-                                            onPress={() => selectCheckbox('option1')}
+                                            onPress={() => selectCheckbox('1')}
                                         >
-                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === 'option1' ? '#52B400' : '#BABABA'} />
+                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === '1' ? '#52B400' : '#BABABA'} />
                                         </TouchableOpacity>
                                         <View style={styles.modalContentTextContainer}>
                                             <Text style={{ color: '#1D1B20', fontSize: 16, fontWeight: '900' }}>함께 쇼핑부터 할래요</Text>
@@ -209,9 +248,9 @@ const PostWrite = () => {
                                     <View style={styles.modalContentContainer}>
                                         <TouchableOpacity
                                             activeOpacity={0.8}
-                                            onPress={() => selectCheckbox('option2')}
+                                            onPress={() => selectCheckbox('2')}
                                         >
-                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === 'option2' ? '#52B400' : '#BABABA'} />
+                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === '2' ? '#52B400' : '#BABABA'} />
                                         </TouchableOpacity>
                                         <View style={styles.modalContentTextContainer}>
                                             <Text style={{ color: '#1D1B20', fontSize: 16, fontWeight: '900' }}>내가 먼저 사고 현장에서 나눠줄래요</Text>
@@ -221,9 +260,9 @@ const PostWrite = () => {
                                     <View style={styles.modalContentContainer}>
                                         <TouchableOpacity
                                             activeOpacity={0.8}
-                                            onPress={() => selectCheckbox('option3')}
+                                            onPress={() => selectCheckbox('3')}
                                         >
-                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === 'option3' ? '#52B400' : '#BABABA'} />
+                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === '3' ? '#52B400' : '#BABABA'} />
                                         </TouchableOpacity>
                                         <View style={styles.modalContentTextContainer}>
                                             <Text style={{ color: '#1D1B20', fontSize: 16, fontWeight: '900' }}>내가 먼저 사고 공용 냉장고에 보관할래요</Text>
@@ -233,9 +272,9 @@ const PostWrite = () => {
                                     <View style={styles.modalContentContainer}>
                                         <TouchableOpacity
                                             activeOpacity={0.8}
-                                            onPress={() => selectCheckbox('option4')}
+                                            onPress={() => selectCheckbox('4')}
                                         >
-                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === 'option4' ? '#52B400' : '#BABABA'} ㅋ />
+                                            <Ionicons name='checkbox' size={24} color={selectedCheckbox === '4' ? '#52B400' : '#BABABA'} ㅋ />
                                         </TouchableOpacity>
                                         <View style={styles.modalContentTextContainer}>
                                             <Text style={{ color: '#1D1B20', fontSize: 16, fontWeight: '900' }}>참여자와 조율할래요</Text>
@@ -348,6 +387,8 @@ const PostWrite = () => {
                                     textAlignVertical: 'top',
                                     fontSize: 16,
                                 }}
+                                value={content}
+                                onChangeText={setContent}
                             />
                         </View>
                     </View>

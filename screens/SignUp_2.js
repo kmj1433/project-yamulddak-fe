@@ -1,16 +1,22 @@
-import { Alert, View, Text, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, TextInput } from 'react-native'
-import React, { useState, useEffect } from 'react'
-import Feather from 'react-native-vector-icons/Feather'
+import { Alert, View, Text, SafeAreaView, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import Feather from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth'
+import { createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../services/Firebase';
+import { useSignUp } from '../context/SignUpProvider';
 
 const SignUp_2 = () => {
     const navigation = useNavigation();
+    const { userInfo, setUserInfo } = useSignUp();
 
+    // 포커스 상태 관리
     const [isNameFocused, setIsNameFocused] = useState(false);
     const [isEmailFocused, setIsEmailFocused] = useState(false);
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+    // 비밀번호 상태 변수 선언 추가
+    const [password, setPassword] = useState('');
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -22,20 +28,20 @@ const SignUp_2 = () => {
         return unsubscribe;
     }, []);
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-
     const handleSignUp = async () => {
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            // Firebase 인증을 사용해 사용자 생성
+            const userCredential = await createUserWithEmailAndPassword(auth, userInfo.email, password);
             console.log('user', userCredential.user);
 
-            Alert.alert(
-                '회원가입 성공',
-                `${email}으로 가입되었습니다. 👋`,
-                [{ text: '닫기' }]
-            );
+            // 이메일과 이름을 Context에 저장 (상태 업데이트)
+            setUserInfo({
+                ...userInfo,
+                name: userInfo.name,
+                email: userInfo.email,
+            });
+
+            // 다음 회원가입 단계로 이동
             navigation.navigate('SignUp_3');
         } catch (error) {
             console.log(error.message);
@@ -69,8 +75,8 @@ const SignUp_2 = () => {
                             placeholderTextColor={'#929292'}
                             onFocus={() => setIsNameFocused(true)}
                             onBlur={() => setIsNameFocused(false)}
-                            value={name}
-                            onChangeText={text => setName(text)}
+                            value={userInfo.name}
+                            onChangeText={text => setUserInfo({ ...userInfo, name: text })}
                             style={{ flex: 1 }}
                         />
                     </View>
@@ -86,8 +92,8 @@ const SignUp_2 = () => {
                             placeholderTextColor={'#929292'}
                             onFocus={() => setIsEmailFocused(true)}
                             onBlur={() => setIsEmailFocused(false)}
-                            value={email}
-                            onChangeText={text => setEmail(text)}
+                            value={userInfo.email}
+                            onChangeText={text => setUserInfo({ ...userInfo, email: text })}
                             style={{ flex: 1 }}
                         />
                     </View>
@@ -121,10 +127,10 @@ const SignUp_2 = () => {
                 </View>
             </View>
         </SafeAreaView>
-    )
-}
+    );
+};
 
-export default SignUp_2
+export default SignUp_2;
 
 const styles = StyleSheet.create({
     container: {
@@ -162,4 +168,4 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         textAlign: 'center'
     }
-})
+});
